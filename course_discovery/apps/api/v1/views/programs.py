@@ -1,4 +1,5 @@
 import base64
+import logging
 
 from django.core.files.base import ContentFile
 from django_filters.rest_framework import DjangoFilterBackend
@@ -14,6 +15,8 @@ from course_discovery.apps.api.cache import CompressedCacheResponseMixin
 from course_discovery.apps.api.pagination import ProxiedPagination
 from course_discovery.apps.api.utils import get_excluded_restriction_types, get_query_param
 from course_discovery.apps.course_metadata.models import CourseRun, Program
+
+logger = logging.getLogger(__name__)
 
 
 class ProgramViewSet(CompressedCacheResponseMixin, viewsets.ReadOnlyModelViewSet):
@@ -39,9 +42,15 @@ class ProgramViewSet(CompressedCacheResponseMixin, viewsets.ReadOnlyModelViewSet
         # This method prevents prefetches on the program queryset from "stacking,"
         # which happens when the queryset is stored in a class property.
         partner = self.request.site.partner
+
+        logger.info(f"Partner: {partner}")
+
         q = self.request.query_params.get('q')
         program_uuid = self.request.parser_context.get('kwargs').get('uuid')
         queryset = Program.objects.filter(partner=partner).order_by('id')
+
+        logger.info(f"Queryset: {queryset}")
+
         if program_uuid:
             queryset = Program.objects.filter(uuid=program_uuid)
         elif q:
