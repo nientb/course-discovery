@@ -43,13 +43,13 @@ class ProgramViewSet(CompressedCacheResponseMixin, viewsets.ReadOnlyModelViewSet
         # which happens when the queryset is stored in a class property.
         partner = self.request.site.partner
 
-        logger.error(f"Partner: {partner}")
+        print(f"Partner: {partner}")
 
         q = self.request.query_params.get('q')
         program_uuid = self.request.parser_context.get('kwargs').get('uuid')
         queryset = Program.objects.filter(partner=partner).order_by('id')
 
-        logger.error(f"Queryset: {queryset}")
+        print(f"Queryset: {queryset}")
 
         if program_uuid:
             queryset = Program.objects.filter(uuid=program_uuid)
