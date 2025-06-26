@@ -127,7 +127,11 @@ class ProgramViewSet(CompressedCacheResponseMixin, viewsets.ReadOnlyModelViewSet
         if get_query_param(self.request, 'uuids_only'):
             # DRF serializers don't have good support for simple, flat
             # representations like the one we want here.
-            queryset = self.filter_queryset(Program.objects.filter(partner=self.request.site.partner))
+
+            partner = self.request.site.partner
+            print(f"Partner: {partner}")
+
+            queryset = self.filter_queryset(Program.objects.filter(partner=partner))
             uuids = queryset.values_list('uuid', flat=True)
 
             return Response(uuids)
