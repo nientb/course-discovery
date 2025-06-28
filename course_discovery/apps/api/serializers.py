@@ -2090,18 +2090,24 @@ class MinimalProgramSerializer(TaggitSerializer, FlexFieldsSerializerMixin, Base
         )
 
     def get_courses(self, program):
+        logger.info(f"Program: {program}")
         course_runs = list(program.course_runs)
 
         if self.context.get('marketable_enrollable_course_runs_with_archived'):
+            logger.info("Marketable enrollable course runs with archived")
             marketable_enrollable_course_runs = set()
             for course in program.courses.all():
                 marketable_enrollable_course_runs.update(course.course_runs.marketable().enrollable())
             course_runs = list(set(course_runs).intersection(marketable_enrollable_course_runs))
 
         if program.order_courses_by_start_date:
+            logger.info("Ordering courses by start date")
             courses = self.sort_courses(program, course_runs)
         else:
+            logger.info("Not ordering courses by start date")
             courses = program.courses.all()
+
+        logger.info(f"Courses: {courses}")
 
         course_serializer = MinimalProgramCourseSerializer(
             courses,
@@ -2115,6 +2121,8 @@ class MinimalProgramSerializer(TaggitSerializer, FlexFieldsSerializerMixin, Base
                 'use_full_course_serializer': self.context.get('use_full_course_serializer', False),
             }
         )
+
+        logger.info(f"Course serializer: {course_serializer}")
 
         return course_serializer.data
 
